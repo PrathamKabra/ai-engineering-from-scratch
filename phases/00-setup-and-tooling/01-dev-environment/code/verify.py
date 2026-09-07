@@ -55,12 +55,18 @@ def command_result(command: str, minimum_major: int | None = None) -> Result:
         return Result(False, f"could not run {path}: {exc}")
 
     output = (process.stdout or process.stderr).strip().splitlines()
-    detail = output[0] if output else f"exit code {process.returncode} with no version output"
+    detail = (
+        output[0]
+        if output
+        else f"exit code {process.returncode} with no version output"
+    )
     if process.returncode != 0:
         return Result(False, detail)
 
     if minimum_major is not None:
-        digits = "".join(character if character.isdigit() else " " for character in detail)
+        digits = "".join(
+            character if character.isdigit() else " " for character in detail
+        )
         parts = digits.split()
         if not parts:
             return Result(False, f"could not parse a version from {detail!r}")
@@ -75,7 +81,9 @@ def python_result() -> Result:
     version = platform.python_version()
     executable = sys.executable
     if sys.version_info < (3, 11):
-        return Result(False, f"found Python {version} at {executable}; need Python 3.11+")
+        return Result(
+            False, f"found Python {version} at {executable}; need Python 3.11+"
+        )
     return Result(True, f"Python {version} at {executable}")
 
 
@@ -87,12 +95,16 @@ def module_result(module: str) -> Result:
 
 def gpu_result() -> Result:
     if importlib.util.find_spec("torch") is None:
-        return Result(False, "PyTorch is not installed, so no accelerator backend was checked")
+        return Result(
+            False, "PyTorch is not installed, so no accelerator backend was checked"
+        )
 
     try:
         import torch
     except Exception as exc:
-        return Result(False, f"PyTorch could not be imported: {type(exc).__name__}: {exc}")
+        return Result(
+            False, f"PyTorch could not be imported: {type(exc).__name__}: {exc}"
+        )
 
     if torch.cuda.is_available():
         return Result(True, f"CUDA: {torch.cuda.get_device_name(0)}")
@@ -166,7 +178,17 @@ PROBES = {
 }
 
 
-BASE_OPTIONAL = ("node", "npx", "numpy", "matplotlib", "jupyter", "torch", "gpu", "cargo", "julia")
+BASE_OPTIONAL = (
+    "node",
+    "npx",
+    "numpy",
+    "matplotlib",
+    "jupyter",
+    "torch",
+    "gpu",
+    "cargo",
+    "julia",
+)
 
 ROUTES = {
     "beginner": Route(
@@ -214,7 +236,9 @@ ROUTES = {
         ("python", "git"),
         ("node", "npx"),
         "Open certifications/claude/GETTING_STARTED.md and choose a track.",
-        ("If using the AI tutor, confirm your selected host can read repository skills.",),
+        (
+            "If using the AI tutor, confirm your selected host can read repository skills.",
+        ),
     ),
 }
 
